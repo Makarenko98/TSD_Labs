@@ -1,6 +1,6 @@
-csc /target:module /out:"bin/Lib.netmodule" Student.cs Teacher.cs IPerson.cs
+csc /target:library /out:"bin/Lib.dll" Student.cs Teacher.cs IPerson.cs LibAssemblyInfo.cs /keyfile:sgPublicKey.snk /delaysign
 
-al ./bin/Lib.netmodule /out:"bin/Lib.dll" /keyfile:sgKey.snk /delaysign  /version:2.0.0.0
+::al ./bin/Lib.netmodule /out:"bin/Lib.dll" /keyfile:sgPublicKey.snk /delaysign  /version:2.0.0.0
 
 sn -Vr ./bin/Lib.dll sgKey.snk
 
