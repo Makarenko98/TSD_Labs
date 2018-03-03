@@ -33,9 +33,9 @@ namespace Lib
             return Name + " " + Course + " course";
         }
 
-        public void Greeting()
+        public string Greeting()
         {
-            Console.WriteLine("hello I'm "+ Name +" - Student");
+            return "hello I'm "+ Name +" - Student";
         }
     }
 }

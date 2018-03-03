@@ -10,14 +10,14 @@ namespace Lib
         public string Subject { get; set; }
         public int Experience { get; set; }
 
-        public Teacher(string name, string subject)
+        public Teacher (string name, string subject)
         {
             Name = name;
             Subject = subject;
         }
-        public void Greeting ()
+        public string Greeting ()
         {
-            Console.WriteLine ("hello I'm " + Name + " - " + Subject + " teacher");
+            return "hello I'm " + Name + " - " + Subject + " teacher";
         }
     }
 }

@@ -11,9 +11,9 @@ namespace App
             s.AverageScore = 4;
             System.Console.WriteLine (s.Name + " stipend = " + s.Stipend);
             IPerson p = new Student ("Ivan", 3);
-            p.Greeting ();
+            Console.WriteLine(p.Greeting ());
             p = new Teacher ("Oleg", "Matan");
-            p.Greeting ();
+            Console.WriteLine(p.Greeting ());
             Console.ReadKey ();
         }
     }

@@ -6,6 +6,6 @@ namespace Lib
     {
         string Name { get; set; }
         DateTime BirthDate { get; set; }
-        void Greeting ();
+        string Greeting ();
     }
 }
