@@ -38,6 +38,12 @@ namespace Lab2_Lib
             return -1;
         }
 
+        #region events
+        public event EventHandler OnAdd;
+        public event EventHandler OnRemove;
+        public event EventHandler OnClear;
+        #endregion
+
         #region constructors
 
         public MyDictionary() { }
@@ -69,11 +75,13 @@ namespace Lab2_Lib
             Comparer = comparer;
         }
 
-        public MyDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer):this(dictionary) {
+        public MyDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) : this(dictionary)
+        {
             Comparer = comparer;
         }
 
-        public MyDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer):this(collection) {
+        public MyDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : this(collection)
+        {
             Comparer = comparer;
         }
 
@@ -127,6 +135,8 @@ namespace Lab2_Lib
                 temp.CopyTo(_collection, 0);
             }
             _collection[_count++] = item;
+
+            OnAdd?.Invoke(this, new MyDictionaryEventArgs<TKey, TValue>(item));
         }
 
         public void Add(TKey key, TValue value)
@@ -138,6 +148,7 @@ namespace Lab2_Lib
         {
             _count = 0;
             _collection = new KeyValuePair<TKey, TValue>[DEFAULT_INITIAL_SIZE];
+            OnClear?.Invoke(this, null);
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
@@ -165,6 +176,7 @@ namespace Lab2_Lib
             int index = indexOf(item.Key);
             if (_collection[index].Key.Equals(item.Key) && _collection[index].Value.Equals(item.Value)) {
                 _count--;
+                OnRemove?.Invoke(this, new MyDictionaryEventArgs<TKey, TValue>(_collection[index]));
                 _collection[index] = _collection[_count];
                 return true;
             }
@@ -176,6 +188,7 @@ namespace Lab2_Lib
             int index = indexOf(key);
             if (_collection[index].Key.Equals(key)) {
                 _count--;
+                OnRemove?.Invoke(this, new MyDictionaryEventArgs<TKey, TValue>(_collection[index]));
                 _collection[index] = _collection[_count];
                 return true;
             }

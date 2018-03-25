@@ -10,30 +10,47 @@ namespace Lab2_ConsoleApp
         static void Main(string[] args)
         {
             MyDictionary<int, string> d = new MyDictionary<int, string>();
-            Dictionary<int, string>
-            var val = new KeyValuePair<int, string>(1, "one");
-            d.Add(val.Key, val.Value);
-            d.Add(3, "three");
+
+            d.OnAdd += (o, e) => Console.WriteLine($"OnAdd event: Item added: " +
+                $"{(e as MyDictionaryEventArgs<int, string>).Item.Key} - " +
+                $"{(e as MyDictionaryEventArgs<int, string>).Item.Value}");
+            d.OnRemove += (o, e) => Console.WriteLine($"OnRemove event: Item removed: " +
+                $"{(e as MyDictionaryEventArgs<int, string>).Item.Key} - " +
+                $"{(e as MyDictionaryEventArgs<int, string>).Item.Value}");
+
+            d.OnClear += (o, e) => Console.WriteLine($"OnClear event: collection cleared");
+
+            d.Add(1, "one");
             d.Add(2, "two");
-            d.Remove(3);
-            d.Add(4, "tree");
-            d[1] = "asdas";
-            Console.WriteLine(d.Contains(val));
-            new KeyValuePair<string, string>(null, null);
-            KeyValuePair<int, string>[] k = new KeyValuePair<int, string>[1]
-                {
-                    new KeyValuePair<int, string>(1, "1")
-                };
-            
+            d.Add(3, "three");
 
-            Console.WriteLine(k);
+            Console.WriteLine("Dictionary:");
+            d.PrintDictionary();
+            d.Remove(1);
 
-            Console.WriteLine();
+            Console.WriteLine("d.ContainsKey(2): " + d.ContainsKey(2));
 
-            foreach (var i in d)
-                Console.WriteLine($"{i.Key} {i.Value}");
+            Console.WriteLine("Keys:");
+            foreach(var i in d.Keys)
+                Console.WriteLine(i);
 
-            Console.ReadLine();
+            Console.WriteLine("Values");
+            foreach (var i in d.Values)
+                Console.WriteLine(i);
+
+            string val;
+            Console.WriteLine("d.TryGetValue(5, out val)");
+            if(!d.TryGetValue(5, out val))
+                Console.WriteLine("Value by key 5 can not be obtained");
+            else
+                Console.WriteLine(val);
+
+            if(!d.TryAdd(2, "2"))
+                Console.WriteLine("Item could not be added");
+
+            d.Clear();
+
+            Console.ReadKey();
         }
     }
 }
