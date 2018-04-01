@@ -4,3 +4,5 @@ IL/
 out/
 .vs/
 ~$*
+*.ncrunchsolution*
+*NCrunch*/
