@@ -153,7 +153,8 @@ namespace Lab2_Lib
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
         {
-            return TryGetValue(item.Key, out TValue value) && value.Equals(item.Value);
+            return TryGetValue(item.Key, out TValue value) &&
+                (value == null && item.Value == null || value.Equals(item.Value));
         }
 
         public bool ContainsKey(TKey key)
@@ -163,7 +164,15 @@ namespace Lab2_Lib
 
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            _collection.CopyTo(array, arrayIndex);
+            if (arrayIndex < 0)
+                throw new ArgumentOutOfRangeException("arrayIndex can't be less than 0");
+            if (array == null)
+                throw new ArgumentNullException("Array can't be null");
+            if (array.Length < _count + arrayIndex)
+                throw new ArgumentException("Destination array was not long enough");
+            for (int i = 0; i < _count; i++) {
+                array[i + arrayIndex] = _collection[i];
+            }
         }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
@@ -174,7 +183,7 @@ namespace Lab2_Lib
         public bool Remove(KeyValuePair<TKey, TValue> item)
         {
             int index = indexOf(item.Key);
-            if (_collection[index].Key.Equals(item.Key) && _collection[index].Value.Equals(item.Value)) {
+            if (index != -1 && _collection[index].Value.Equals(item.Value)) {
                 _count--;
                 OnRemove?.Invoke(this, new MyDictionaryEventArgs<TKey, TValue>(_collection[index]));
                 _collection[index] = _collection[_count];
@@ -186,9 +195,12 @@ namespace Lab2_Lib
         public bool Remove(TKey key)
         {
             int index = indexOf(key);
-            if (_collection[index].Key.Equals(key)) {
+            if (index != -1) {
                 _count--;
                 OnRemove?.Invoke(this, new MyDictionaryEventArgs<TKey, TValue>(_collection[index]));
+                if (_count == 0) {
+                    _collection[index] = default(KeyValuePair<TKey, TValue>);
+                }
                 _collection[index] = _collection[_count];
                 return true;
             }
@@ -227,6 +239,11 @@ namespace Lab2_Lib
                 return false;
             Add(key, value);
             return true;
+        }
+
+        public bool TryAdd(KeyValuePair<TKey, TValue> item)
+        {
+            return TryAdd(item.Key, item.Value);
         }
     }
 }
