@@ -12,11 +12,11 @@ namespace Lab2_ConsoleApp
             MyDictionary<int, string> d = new MyDictionary<int, string>();
 
             d.OnAdd += (o, e) => Console.WriteLine($"OnAdd event: Item added: " +
-                $"{(e as MyDictionaryEventArgs<int, string>).Item.Key} - " +
-                $"{(e as MyDictionaryEventArgs<int, string>).Item.Value}");
+                $"{(e).Item.Key} - " +
+                $"{(e).Item.Value}");
             d.OnRemove += (o, e) => Console.WriteLine($"OnRemove event: Item removed: " +
-                $"{(e as MyDictionaryEventArgs<int, string>).Item.Key} - " +
-                $"{(e as MyDictionaryEventArgs<int, string>).Item.Value}");
+                $"{(e).Item.Key} - " +
+                $"{(e).Item.Value}");
 
             d.OnClear += (o, e) => Console.WriteLine($"OnClear event: collection cleared");
 

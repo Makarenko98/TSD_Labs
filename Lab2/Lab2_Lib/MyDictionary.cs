@@ -39,9 +39,9 @@ namespace Lab2_Lib
         }
 
         #region events
-        public event EventHandler OnAdd;
-        public event EventHandler OnRemove;
-        public event EventHandler OnClear;
+        public event EventHandler<MyDictionaryEventArgs<TKey,TValue>> OnAdd;
+        public event EventHandler<MyDictionaryEventArgs<TKey, TValue>> OnRemove;
+        public event EventHandler<MyDictionaryEventArgs<TKey, TValue>> OnClear;
         #endregion
 
         #region constructors
