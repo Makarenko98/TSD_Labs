@@ -260,5 +260,50 @@ namespace Lab3_Lab2Test
             var arr = new KeyValuePair<int, string>[20];
             Assert.Throws<ArgumentException>(()=> { Dictionary.CopyTo(arr, 0); });
         }
+
+        [Test]
+        public void OnAddTest()
+        {
+            var isEventRunned = false;
+            Dictionary.OnAdd += (s, args) => {
+                isEventRunned = true;
+            };
+
+            Assert.IsFalse(isEventRunned);
+
+            Dictionary.Add(200, "200");
+
+            Assert.IsTrue(isEventRunned);
+        }
+
+        [Test]
+        public void OnClearTest()
+        {
+            var isEventRunned = false;
+            Dictionary.OnClear += (s, args) => {
+                isEventRunned = true;
+            };
+
+            Assert.IsFalse(isEventRunned);
+
+            Dictionary.Clear();
+
+            Assert.IsTrue(isEventRunned);
+        }
+
+        [Test]
+        public void OnRemoveTest()
+        {
+            var isEventRunned = false;
+            Dictionary.OnRemove += (s, args) => {
+                isEventRunned = true;
+            };
+
+            Assert.IsFalse(isEventRunned);
+
+            Dictionary.Remove(1);
+
+            Assert.IsTrue(isEventRunned);
+        }
     }
 }
