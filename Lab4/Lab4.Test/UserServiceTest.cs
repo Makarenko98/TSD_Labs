@@ -3,30 +3,28 @@ using Lab4.BLL.Services;
 using Lab4.BLL.Models;
 using Lab4.BLL;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Lab4.Test
 {
     [TestFixture]
     class UserServiceTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            using (var db = Utils.BuildDbContext()) {
-                db.Database.ExecuteSqlCommand("delete from Users");
-            }
-        }
+        static Random random = new Random();
 
         [Test]
         public void SignUpTest()
         {
             using (var db = Utils.BuildDbContext()) {
                 var service = new UserService(db);
+                var uid = random.Next();
+                var login = "user" + uid;
+                var pass = "pass" + uid;
                 var user = service.SignUp(new User() {
-                    Login = "user",
-                    Password = "pass",
-                    FirstName = "James",
-                    Email = "james@gmail.com"
+                    Login = login,
+                    Password = pass,
+                    FirstName = "James" + uid,
+                    Email = $"james@gmail{uid}.com"
                 });
                 Assert.AreEqual(user.Login, db.Users.Find(user.Id).Login);
             }
@@ -37,20 +35,22 @@ namespace Lab4.Test
         {
             using (var db = Utils.BuildDbContext()) {
                 var service = new UserService(db);
-
+                var uid = random.Next();
+                var login = "user" + uid;
+                var pass = "pass" + uid;
                 var createdUser = service.SignUp(new User() {
-                    Login = "user",
-                    Password = "pass",
-                    FirstName = "James",
-                    Email = "james@gmail.com"
+                    Login = login,
+                    Password = pass,
+                    FirstName = "James" + uid,
+                    Email = $"james@gmail{uid}.com"
                 });
 
-                var user = service.SignIn("user", "pass");
+                var user = service.SignIn(login, pass);
 
                 Assert.AreEqual(user.Login, createdUser.Login);
 
-                Assert.IsNull(service.SignIn("user", "123"));
-                Assert.IsNull(service.SignIn("usss", "pass"));
+                Assert.IsNull(service.SignIn(login, random.Next().ToString()));
+                Assert.IsNull(service.SignIn("user" + random.Next(), pass));
             }
         }
     }
