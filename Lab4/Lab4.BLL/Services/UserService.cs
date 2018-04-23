@@ -10,11 +10,11 @@ namespace Lab4.BLL.Services
 {
     public class UserService
     {
-        protected SocialNetDbContext DbContext;
+        protected string ConnectionString;
 
-        public UserService(SocialNetDbContext dbContext)
+        public UserService(string connectionString)
         {
-            DbContext = dbContext;
+            ConnectionString = connectionString;
         }
 
         public User SignUp(User user)
@@ -34,19 +34,23 @@ namespace Lab4.BLL.Services
                 throw new ArgumentException($"Field {emptyFieldName} must be filled");
 
             user.Password = CryptoUtils.HashPassword(user.Password);
+            using (var dbConext = new SocialNetDbContext(ConnectionString)) {
+                user = dbConext.Users.Add(user).Entity;
+                dbConext.SaveChanges();
 
-            user = DbContext.Users.Add(user).Entity;
-            DbContext.SaveChanges();
-
-            return DbContext.Entry(user).Entity;
+                return dbConext.Entry(user).Entity;
+            }
         }
 
         public User SignIn(string login, string password)
         {
             var hashedPassword = CryptoUtils.HashPassword(password);
-            var user = DbContext.Users
-                .Where(u => u.Login == login)
-                .FirstOrDefault();
+            User user = null;
+            using (var dbContext = new SocialNetDbContext(ConnectionString)) {
+                user = dbContext.Users
+                    .Where(u => u.Login == login)
+                    .FirstOrDefault();
+            }
             if (user == null)
                 return null;
             if (CryptoUtils.VerifyHashedPassword(user.Password, password))

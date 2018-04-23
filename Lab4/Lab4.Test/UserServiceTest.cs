@@ -15,43 +15,41 @@ namespace Lab4.Test
         [Test]
         public void SignUpTest()
         {
-            using (var db = Utils.BuildDbContext()) {
-                var service = new UserService(db);
-                var uid = random.Next();
-                var login = "user" + uid;
-                var pass = "pass" + uid;
-                var user = service.SignUp(new User() {
-                    Login = login,
-                    Password = pass,
-                    FirstName = "James" + uid,
-                    Email = $"james@gmail{uid}.com"
-                });
-                Assert.AreEqual(user.Login, db.Users.Find(user.Id).Login);
+            var service = new UserService(Utils.ConnectionString);
+            var uid = random.Next();
+            var login = "user" + uid;
+            var pass = "pass" + uid;
+            var user = service.SignUp(new User() {
+                Login = login,
+                Password = pass,
+                FirstName = "James" + uid,
+                Email = $"james@gmail{uid}.com"
+            });
+            using (var dbConext = new SocialNetDbContext(Utils.ConnectionString)) {
+                Assert.AreEqual(user.Login, dbConext.Users.Find(user.Id).Login);
             }
         }
 
         [Test]
         public void SighInTest()
         {
-            using (var db = Utils.BuildDbContext()) {
-                var service = new UserService(db);
-                var uid = random.Next();
-                var login = "user" + uid;
-                var pass = "pass" + uid;
-                var createdUser = service.SignUp(new User() {
-                    Login = login,
-                    Password = pass,
-                    FirstName = "James" + uid,
-                    Email = $"james@gmail{uid}.com"
-                });
+            var service = new UserService(Utils.ConnectionString);
+            var uid = random.Next();
+            var login = "user" + uid;
+            var pass = "pass" + uid;
+            var createdUser = service.SignUp(new User() {
+                Login = login,
+                Password = pass,
+                FirstName = "James" + uid,
+                Email = $"james@gmail{uid}.com"
+            });
 
-                var user = service.SignIn(login, pass);
+            var user = service.SignIn(login, pass);
 
-                Assert.AreEqual(user.Login, createdUser.Login);
+            Assert.AreEqual(user.Login, createdUser.Login);
 
-                Assert.IsNull(service.SignIn(login, random.Next().ToString()));
-                Assert.IsNull(service.SignIn("user" + random.Next(), pass));
-            }
+            Assert.IsNull(service.SignIn(login, random.Next().ToString()));
+            Assert.IsNull(service.SignIn("user" + random.Next(), pass));
         }
     }
 }
