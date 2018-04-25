@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Lab4.BLL.Services
 {
-    class UserPhotoService
+    public class UserPhotoService
     {
         protected string ConnectionString;
         protected string FileStoragePath;
@@ -18,9 +18,14 @@ namespace Lab4.BLL.Services
             ConnectionString = connectionString;
         }
 
+        private string GetUserPhotoDirectoryPath(int userId)
+        {
+            return FileStoragePath + "\\" + userId.ToString();
+        }
+
         private DirectoryInfo CreateUserPhotoDirectoryIfNotExists(int userId)
         {
-            string directoryPath = FileStoragePath + "\\" + userId.ToString();
+            string directoryPath = GetUserPhotoDirectoryPath(userId);
             if (Directory.Exists(directoryPath)) {
                 return new DirectoryInfo(directoryPath);
             }
@@ -75,6 +80,22 @@ namespace Lab4.BLL.Services
                 db.SaveChanges();
             }
             return userPhoto;
+        }
+
+        public Stream GetPhoto(UserPhoto userPhoto)
+        {
+            var path = GetUserPhotoDirectoryPath(userPhoto.UserId);
+            if (File.Exists(path)) {
+                return new FileStream(path, FileMode.Open, FileAccess.Read);
+            }
+            return null;
+        }
+
+        public Stream GetUserProfilePhoto(int userId)
+        {
+            using (var db = new SocialNetDbContext(ConnectionString)) {
+                return GetPhoto(db.Users.Find(userId).ProfilePhoto);
+            }
         }
     }
 }

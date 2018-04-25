@@ -43,6 +43,12 @@ namespace Lab4.BLL
                 .HasIndex(fr => new { fr.UserId, fr.FriendId }).IsUnique();
             modelBuilder.Entity<UserPhoto>()
                 .Property(uf => uf.LoadTime).HasDefaultValueSql("getutcdate()");
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.ProfilePhoto)
+                .WithOne(pf => pf.User)
+                .HasForeignKey<UserPhoto>(up => up.UserId);
+
         }
     }
 }

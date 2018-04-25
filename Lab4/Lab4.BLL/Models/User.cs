@@ -27,6 +27,10 @@ namespace Lab4.BLL.Models
         [Column(TypeName = "nvarchar(100)")]
         public string PhoneNumber { get; set; }
 
+        public int ProfilePhotoId { get; set; }
+
+        public UserPhoto ProfilePhoto { get; set; }
+
         public ICollection<ChatUser> ChatUser { get; set; }
 
         public ICollection<Message> Messages { get; set; }
