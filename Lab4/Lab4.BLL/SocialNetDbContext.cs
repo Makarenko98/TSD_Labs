@@ -10,6 +10,8 @@ namespace Lab4.BLL
         public DbSet<Chat> Chats { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<ChatUser> ChatUsers { get; set; }
+        public DbSet<FriendRequest> FriendRequests { get; set; }
+        public DbSet<UserFriend> UserFriends { get; set; }
 
         public SocialNetDbContext() : base()
         { }
@@ -34,6 +36,10 @@ namespace Lab4.BLL
                 .HasIndex(u => u.Login).IsUnique();
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email).IsUnique();
+            //modelBuilder.Entity<FriendRequest>()
+            //    .HasIndex(fr => new { fr.FromUserId, fr.ToUserId }).IsUnique();
+            modelBuilder.Entity<UserFriend>()
+                .HasIndex(fr => new { fr.UserId, fr.FriendId }).IsUnique();
         }
     }
 }
