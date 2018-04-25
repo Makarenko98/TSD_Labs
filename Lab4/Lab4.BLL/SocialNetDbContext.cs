@@ -12,6 +12,7 @@ namespace Lab4.BLL
         public DbSet<ChatUser> ChatUsers { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }
         public DbSet<UserFriend> UserFriends { get; set; }
+        public DbSet<UserPhoto> UserPhotos { get; set; }
 
         public SocialNetDbContext() : base()
         { }
@@ -40,6 +41,8 @@ namespace Lab4.BLL
             //    .HasIndex(fr => new { fr.FromUserId, fr.ToUserId }).IsUnique();
             modelBuilder.Entity<UserFriend>()
                 .HasIndex(fr => new { fr.UserId, fr.FriendId }).IsUnique();
+            modelBuilder.Entity<UserPhoto>()
+                .Property(uf => uf.LoadTime).HasDefaultValueSql("getutcdate()");
         }
     }
 }
