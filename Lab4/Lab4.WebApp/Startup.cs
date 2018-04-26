@@ -10,6 +10,7 @@ using Lab4.BLL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Lab4.BLL.Services;
+using System.IO;
 
 namespace Lab4.WebApp
 {
@@ -18,6 +19,22 @@ namespace Lab4.WebApp
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            EnsureFileStorageCreated(Configuration.GetValue<string>("FileStoragePath"));
+            EnsureDatabaseCreated(Configuration.GetConnectionString("SocialNet"));
+        }
+
+        private void EnsureDatabaseCreated(string connectionString)
+        {
+            using(var db = new SocialNetDbContext(connectionString)) {
+                db.Database.EnsureCreated();
+            }
+        }
+
+        private void EnsureFileStorageCreated(string storagePath)
+        {
+            if (!Directory.Exists(storagePath)) {
+                Directory.CreateDirectory(storagePath);
+            }
         }
 
         public IConfiguration Configuration { get; }
@@ -34,8 +51,7 @@ namespace Lab4.WebApp
             services.AddDbContext<SocialNetDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
+                .AddCookie(options => {
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
 
@@ -44,13 +60,11 @@ namespace Lab4.WebApp
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
+            if (env.IsDevelopment()) {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
+            else {
                 app.UseExceptionHandler("/Home/Error");
             }
 
@@ -58,8 +72,7 @@ namespace Lab4.WebApp
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
+            app.UseMvc(routes => {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");

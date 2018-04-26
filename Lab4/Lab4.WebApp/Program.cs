@@ -14,7 +14,6 @@ namespace Lab4.WebApp
     {
         public static void Main(string[] args)
         {
-            EnsureFileStorageCreated();
             BuildWebHost(args).Run();
         }
 
@@ -23,12 +22,6 @@ namespace Lab4.WebApp
                 .UseStartup<Startup>()
                 .Build();
 
-        public static void EnsureFileStorageCreated()
-        {
-            var storagePath = ConfigurationUtils.FileStoragePath;
-            if (!Directory.Exists(storagePath)) {
-                Directory.CreateDirectory(storagePath);
-            }
-        }
+        
     }
 }

@@ -8,7 +8,7 @@ namespace Lab4.BLL.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<ChatUser> ChatUser { get; set; }
+        public ICollection<ChatUser> ChatUsers { get; set; }
         public ICollection<Message> Messages { get; set; }
     }
 }
