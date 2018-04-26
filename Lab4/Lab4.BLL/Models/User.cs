@@ -34,5 +34,11 @@ namespace Lab4.BLL.Models
         public ICollection<ChatUser> ChatUser { get; set; }
 
         public ICollection<Message> Messages { get; set; }
+
+        public ICollection<UserPhoto> UserPhotos { get; set; }
+
+        public ICollection<UserFriend> UserFriends { get; set; }
+
+        public ICollection<UserFriend> Followers { get; set; }
     }
 }

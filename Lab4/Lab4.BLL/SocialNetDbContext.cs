@@ -1,6 +1,7 @@
 ﻿using Lab4.BLL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 
 namespace Lab4.BLL
 {
@@ -29,6 +30,7 @@ namespace Lab4.BLL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<ChatUser>()
                 .HasKey(cu => new { cu.ChatId, cu.UserId });
             modelBuilder.Entity<Message>()
@@ -44,11 +46,24 @@ namespace Lab4.BLL
             modelBuilder.Entity<UserPhoto>()
                 .Property(uf => uf.LoadTime).HasDefaultValueSql("getutcdate()");
 
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.ProfilePhoto)
-                .WithOne(pf => pf.User)
-                .HasForeignKey<UserPhoto>(up => up.UserId);
+            modelBuilder.Entity<UserPhoto>()
+                .HasOne(up => up.User)
+                .WithMany(u => u.UserPhotos)
+                .HasForeignKey(up => up.UserId);
 
+            modelBuilder.Entity<UserFriend>()
+                .HasOne(uf => uf.User)
+                .WithMany(u => u.UserFriends)
+                .HasForeignKey(uf => uf.UserId);
+
+            modelBuilder.Entity<UserFriend>()
+                .HasOne(uf => uf.Friend)
+                .WithMany(u => u.Followers)
+                .HasForeignKey(pt => pt.FriendId);
+
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) {
+                relationship.DeleteBehavior = DeleteBehavior.Restrict; // set on delete no action
+            }
         }
     }
 }
