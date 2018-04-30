@@ -32,6 +32,7 @@ namespace Lab4.BLL.Services
 
             using (var db = new SocialNetDbContext(ConnectionString)) {
                 db.FriendRequests.Add(friendRequest);
+                db.SaveChanges();
             }
 
             return friendRequest;

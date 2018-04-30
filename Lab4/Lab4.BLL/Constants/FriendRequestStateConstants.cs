@@ -6,9 +6,9 @@ namespace Lab4.BLL.Constants
 {
     public static class FriendRequestStateConstants
     {
-        public const int New = 1;
-        public const int Accepted = 2;
-        public const int Postponed = 3;
-        public const int Rejected = 4;
+        public const int New = 0;
+        public const int Accepted = 1;
+        public const int Postponed = 2;
+        public const int Rejected = 3;
     }
 }
