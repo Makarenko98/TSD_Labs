@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Lab4.BLL.Services;
 using System.IO;
+using System.Data.SqlClient;
+using Dapper;
 
 namespace Lab4.WebApp
 {
@@ -20,13 +22,31 @@ namespace Lab4.WebApp
         {
             Configuration = configuration;
             EnsureFileStorageCreated(Configuration.GetValue<string>("FileStoragePath"));
-            EnsureDatabaseCreated(Configuration.GetConnectionString("SocialNet"));
+            var connectionString = Configuration.GetConnectionString("SocialNet");
+            EnsureDatabaseCreated(connectionString);
+            InitData(connectionString, Configuration.GetValue<string>("DataInitializersDirectoryPath"));
         }
 
         private void EnsureDatabaseCreated(string connectionString)
         {
-            using(var db = new SocialNetDbContext(connectionString)) {
+            using (var db = new SocialNetDbContext(connectionString)) {
                 db.Database.EnsureCreated();
+            }
+        }
+
+        private void InitData(string connectionString, string dataInitializersDirectoryPath)
+        {
+            if (!Directory.Exists(dataInitializersDirectoryPath))
+                return;
+            string initSql = "";
+            using (var db = new SqlConnection(connectionString)) {
+                foreach (var path in Directory.GetFiles(dataInitializersDirectoryPath)) {
+                    initSql = "";
+                    using (var reader = new StreamReader(File.Open(path, FileMode.Open, FileAccess.Read))) {
+                        initSql = reader.ReadToEnd();
+                    }
+                    db.Execute(initSql);
+                }
             }
         }
 
