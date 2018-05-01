@@ -61,6 +61,16 @@ namespace Lab4.BLL
                 .WithMany(u => u.Followers)
                 .HasForeignKey(pt => pt.FriendId);
 
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.FromUser)
+                .WithMany(u => u.SentRequests)
+                .HasForeignKey(fr => fr.FromUserId);
+
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.ToUser)
+                .WithMany(u => u.FriendRequests)
+                .HasForeignKey(fr => fr.ToUserId);
+
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict; // set on delete no action
             }

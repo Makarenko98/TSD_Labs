@@ -40,5 +40,9 @@ namespace Lab4.BLL.Models
         public ICollection<UserFriend> UserFriends { get; set; }
 
         public ICollection<UserFriend> Followers { get; set; }
+
+        public ICollection<FriendRequest> SentRequests{ get; set; }
+
+        public ICollection<FriendRequest> FriendRequests { get; set; }
     }
 }
