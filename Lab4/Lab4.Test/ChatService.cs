@@ -4,8 +4,6 @@ using System.Text;
 using Lab4.BLL.Services;
 using Lab4.BLL.Models;
 using NUnit.Framework;
-using Lab4.WebApp;
-using Lab4.BLL;
 
 namespace Lab4.Test
 {
@@ -17,14 +15,6 @@ namespace Lab4.Test
         {
             var service = new ChatService(Utils.ConnectionString);
             var messages = service.GetNextMessages(14, 15, 10);
-        }
-
-        [Test]
-        public void HlamTest()
-        {
-            using(var db = new SocialNetDbContext(Utils.ConnectionString)) {
-                db.Database.EnsureCreated();
-            }
         }
     }
 }
