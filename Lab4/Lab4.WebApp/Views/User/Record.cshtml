@@ -1,0 +1,40 @@
+﻿@model User
+@{
+    ViewData["Title"] = "Record";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>@Model.FirstName @Model.LastName</h2>
+        @if (ViewBag.CanSendFriendRequest) {
+            <button class="btn btn-default" id="friendRequestBtn">Send friend request</button>
+        }
+    </div>
+    <div class="col-md-5">
+        <h3>Friends:</h3>
+        <ul class="list-group">
+            @foreach (var uf in Model.UserFriends) {
+                <li class="list-group-item">
+                    <a asp-controller="User" asp-action="Record" asp-route-id=@uf.FriendId>@uf.Friend.FirstName @uf.Friend.LastName</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        var userId = @Model.Id;
+        $("#friendRequestBtn").on("click", function () {
+            $.ajax(
+                {
+                    type: "POST",
+                    url: "@Url.Action("SendFriendRequest", "Friend")",
+                    data: {
+                        userId: userId
+                    },
+                    dataType: "json"
+                });
+        });
+    </script>
+}

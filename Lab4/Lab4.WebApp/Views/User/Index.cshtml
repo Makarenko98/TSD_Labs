@@ -1,0 +1,20 @@
+﻿@model IEnumerable<User>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Users:</h2>
+<ul class="list-group">
+    @foreach (var u in Model) {
+        <li class="list-group-item">
+            <a asp-controller="User" asp-action="Record" asp-route-id=@u.Id>@u.FirstName @u.LastName</a>
+        </li>
+    }
+</ul>
+@if (ViewBag.page != 0) {
+    <a asp-controller="User" asp-action="Index" asp-route-page=@(ViewBag.page - 1) class="btn btn-default">Prev.</a>
+}
+@if (ViewBag.page != ViewBag.pageNumber - 1) {
+    <a asp-controller="User" asp-action="Index" asp-route-page=@(ViewBag.page + 1) class="btn btn-default">Next.</a>
+}
