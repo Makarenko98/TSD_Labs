@@ -9,7 +9,7 @@ namespace Lab4.Test
     static class Utils
     {
         const string connectionString =
-           @"Data source = localhost\SQLEXPRESS; initial catalog = SocialNet; integrated security = true";
+           @"Data Source = localhost\\SQLEXPRESS; Initial Catalog = SocialNet; User ID = Admin; Password = Admin; Integrated security = false";
 
         public static string ConnectionString => connectionString;
 
