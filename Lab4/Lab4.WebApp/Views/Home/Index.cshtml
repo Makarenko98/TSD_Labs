@@ -1,11 +1,83 @@
-﻿@{
+﻿@model User
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Application uses</h2>
+        <h2>@Model.FirstName @Model.LastName</h2>
     </div>
     <div class="col-md-5">
+        <h3>Friends:</h3>
+        @if (Model.UserFriends.Count == 0) {
+            <span class="text-info">You do not have friends</span>
+        }
+        else {
+            <ul class="list-group">
+                @foreach (var uf in Model.UserFriends) {
+                    <li class="list-group-item">
+                        <a asp-controller="User" asp-action="Record" asp-route-id=@uf.FriendId>
+                            @uf.Friend.FirstName @uf.Friend.LastName
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        }
+        <h3>Friend requests:</h3>
+        @if (Model.FriendRequests.Count == 0) {
+            <span class="text-info">You do not have friend requests</span>
+        }
+        else {
+            <ul class="list-group">
+                @foreach (var fr in Model.FriendRequests) {
+                    <li class="list-group-item">
+                        <a asp-controller="User" asp-action="Record" asp-route-id=@fr.FromUserId>
+                            @fr.FromUser.FirstName @fr.FromUser.LastName
+                        </a>
+                        <div class="btn-group btn-group-xs" style="float: right">
+                            <button class="btn btn-success btn-accept" requestId="@fr.Id">Accept</button>
+                            <button class="btn btn-warning btn-reject" requestId="@fr.Id">Reject</button>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
     </div>
 </div>
+
+@section Scripts{
+    <script>
+        $(".btn-accept").on("click", function (ev) {
+            let target = ev.currentTarget;
+            let requestId = ev.currentTarget.attributes.requestid.value
+            var a = $.ajax(
+                {
+                    type: "POST",
+                    url: "@Url.Action("AcceptFriendRequest", "Friend")",
+                    data: {
+                        friendRequestId: requestId
+                    },
+                    dataType: "json"
+                }).done(function(){
+                    target.parentElement.parentElement.remove();
+                });
+        });
+        $(".btn-reject").on("click", function (ev) {
+            let target = ev.currentTarget;
+            let requestId = ev.currentTarget.attributes.requestid.value
+            var a = $.ajax(
+                {
+                    type: "POST",
+                    url: "@Url.Action("RejectFriendRequest", "Friend")",
+                    data: {
+                        friendRequestId: requestId
+                    },
+                    dataType: "json"
+                }).done(function(){
+                    target.parentElement.parentElement.remove();
+                });
+        });
+    </script>
+}
