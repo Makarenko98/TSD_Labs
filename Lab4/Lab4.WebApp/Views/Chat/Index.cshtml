@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Chat>
+    @{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    <div id="app">
+        <h2>Chats:</h2>
+        <label for="newChatName">Name for new chat</label>
+        <input type="text" v-model="newChatName" id="newChatName" />
+        <button class="btn btn-default" id="newChatBtn" v-on:click="onNewChatBtnClick"
+                v-bind:disabled="isNewChatBtnDisabled">
+            Create chat
+        </button>
+        <ul class="list-group">
+            @foreach (var c in Model) {
+            <li class="list-group-item">
+                <a asp-controller="Chat" asp-action="Chat" asp-route-id=@c.Id>@c.Name</a>
+            </li>
+            }
+        </ul>
+    </div>
+
+    @section Scripts{
+    <script>
+        let app = new Vue({
+            el: "#app",
+            data: {
+                newChatName: ""
+            },
+            computed: {
+                isNewChatBtnDisabled: function () {
+                    return this.newChatName.trim().length == 0;
+                }
+            },
+            methods: {
+                onNewChatBtnClick: function () {
+                    this.newChatName = this.newChatName.trim();
+                    if (this.newChatName.length == 0) {
+                        alert("Enter chat name");
+                        return;
+                    }
+                    $.post("/Chat/NewChat/", {
+                        chatName: this.newChatName
+                    }, function (id) {
+                        window.location = "/Chat/Chat/" + id;
+                    })
+                }
+            }
+        })
+    </script>
+    }

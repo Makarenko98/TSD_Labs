@@ -13,7 +13,7 @@ namespace Lab4.BLL.Utils
 
         public static string NewLineWithTab(this string str, int tabCount = 1)
         {
-            return str + Environment.NewLine + new string('\t', 1);
+            return str + Environment.NewLine + new string('\t', tabCount);
         }
     }
 }

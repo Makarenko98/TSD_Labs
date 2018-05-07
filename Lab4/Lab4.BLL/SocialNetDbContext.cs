@@ -39,8 +39,7 @@ namespace Lab4.BLL
                 .HasIndex(u => u.Login).IsUnique();
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email).IsUnique();
-            //modelBuilder.Entity<FriendRequest>()
-            //    .HasIndex(fr => new { fr.FromUserId, fr.ToUserId }).IsUnique();
+
             modelBuilder.Entity<UserFriend>()
                 .HasIndex(fr => new { fr.UserId, fr.FriendId }).IsUnique();
             modelBuilder.Entity<UserPhoto>()
@@ -71,6 +70,17 @@ namespace Lab4.BLL
                 .WithMany(u => u.FriendRequests)
                 .HasForeignKey(fr => fr.ToUserId);
 
+
+            modelBuilder.Entity<ChatUser>()
+                .HasOne(cu => cu.User)
+                .WithMany((User u) => u.ChatUsers)
+                .HasForeignKey(cu => cu.UserId);
+
+            modelBuilder.Entity<ChatUser>()
+                .HasOne(cu => cu.Chat)
+                .WithMany((Chat c) => c.ChatUsers)
+                .HasForeignKey(cu => cu.ChatId);
+                
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) {
                 relationship.DeleteBehavior = DeleteBehavior.Restrict; // set on delete no action
             }

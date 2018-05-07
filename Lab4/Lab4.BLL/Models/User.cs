@@ -31,7 +31,7 @@ namespace Lab4.BLL.Models
 
         public UserPhoto ProfilePhoto { get; set; }
 
-        public ICollection<ChatUser> ChatUser { get; set; }
+        public ICollection<ChatUser> ChatUsers { get; set; }
 
         public ICollection<Message> Messages { get; set; }
 

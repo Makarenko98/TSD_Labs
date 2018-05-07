@@ -1,0 +1,179 @@
+﻿@model int
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .selected {
+        background-color: powderblue;
+    }
+</style>
+<div id="chat">
+    <div id="participantsModalBox" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title">Select participant</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="height:400px; overflow-y:scroll">
+                        <ul id="selectParticipantList" class="list-group">
+                            <li class="list-group-item" v-for="f in userFriends" v-bind:rid="f.id">
+                                <input type="checkbox" v-bind:id="'selected' + f.id" v-model="f.selected" />
+                                <label v-bind:for="'selected' + f.id">{{f.firstName + " " + f.lastName}}</label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="cancelModalBox" v-on:click="onCalcelBtnClick">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="okModalBox" v-on:click="onOkBtnClick">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <h3>Chat participants:</h3>
+            <button type="button" class="btn btn-default"
+                    id="addParticipantBtn" v-on:click="onAddParticipantBtnClick">
+                Add participant
+            </button>
+            <ul class="list-group" id="participants">
+                <li v-for="p in participants" class="list-group-item">
+                    {{ p.firstName + " " + p.lastName}}
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <h3>Messages:</h3>
+            <div style="height: 400px; overflow-y: scroll" id="messagesContainer" v-on:scroll="onMessagesScroll">
+                <ul class="list-group" id="messages">
+                    <li class="list-group-item" v-for="m in messages">
+                        <a v-bind:href="'/User/'+m.user.id">{{m.user.firstName + " " + m.user.lastName}}</a>
+                        <small style="float:right">{{new Date(m.time).toLocaleString()}}</small><br />
+                        {{m.text}}
+                    </li>
+                </ul>
+            </div>
+            <textarea class="form-control" rows="5" v-model="message"></textarea>
+            <button class="btn btn-default" style="width:15%"
+                    id="sendMessagebtn" v-on:click="onSendMessageButtonClick">
+                Send
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script>
+        let chatId = @Model;
+        let app = new Vue({
+            el: '#chat',
+            data: {
+                chatId: chatId,
+                chatName: "",
+                participants: [],
+                selectedParticipants: [],
+                userFriends: [],
+                message: "",
+                messages: [],
+                connection: null,
+                scrollLock: false,
+            },
+            created: function () {
+                let scope = this;
+
+                $.get("/Chat/GetChatInfo", {
+                    id: this.chatId
+                }, function (data) {
+                    this.chatName = data.name;
+                    scope.participants = _.map(data.chatUsers, function (i) {
+                        return i.user;
+                    });
+                    scope.messages = data.messages.reverse();
+                    setTimeout(function () {
+                        $('#messagesContainer').scrollTop($('#messages').height())
+                    });
+                    });
+
+                this.connection = new signalR.HubConnection(
+                    "/ChatHub", { logger: signalR.LogLevel.Error })
+
+                this.connection.on("ReceiveMessage", (message) => {
+                    this.messages.push(message);
+                    setTimeout(function () {
+                        $('#messagesContainer').scrollTop($('#messages').height())
+                    });
+                });
+
+                this.connection.start().then(function () {
+                    scope.connection.invoke("JoinChat", scope.chatId)
+                        .catch(err => console.error);
+                }).catch(err => console.error);
+            },
+            methods: {
+                onMessagesScroll: function (ev) {
+                    if ($(ev.target).scrollTop() < 2  && !this.scrollLock) {
+                        this.scrollLock = true;
+                        let scope = this;
+                        $.get("/Chat/GetNextMessages", {
+                            lastMessageId: this.messages[0].id
+                        }, function (data) {
+                            if (data.length == 0) {
+                                return;
+                            }
+                            scope.messages = data.reverse().concat(scope.messages);
+                            setTimeout(function () {
+                                $('#messagesContainer').scrollTop($('#messages li').outerHeight()*(data.length - 1))
+                            });
+                            scope.scrollLock = false;
+                        });
+                    }
+                },
+                onAddParticipantBtnClick: function () {
+                    let scope = this;
+                    $.get("/Chat/GetGetPotentialChatParticipants", {
+                        chatId: this.chatId
+                    },
+                        function (data) {
+                            scope.userFriends = data;
+                            $("#participantsModalBox").modal('show');
+                        })
+                },
+                onCalcelBtnClick: function () {
+                    $("#participantsModalBox").modal('hide');
+                },
+                onOkBtnClick: function () {
+                    let selected = _.filter(this.userFriends, function (f) { return f.selected; });
+                    let scope = this;
+                    if (selected && selected.length) {
+                        $.post("/Chat/AddParticipants", {
+                            users: _.map(selected, function (i) {
+                                return i.id;
+                            }),
+                            chatId: this.chatId
+                        }, function () {
+                            scope.participants = scope.participants.concat(selected);
+                            $("#participantsModalBox").modal('hide');
+                        });
+                    }
+                },
+                onSendMessageButtonClick: function () {
+                    this.message = this.message && this.message.trim();
+                    if (this.message && this.message.length) {
+                        this.connection.invoke("SendMessage", this.chatId, this.message)
+                            .catch(err => console.error);
+                        this.message = "";
+                    }
+                }
+            }
+        })
+    </script>
+}

@@ -75,7 +75,12 @@ namespace Lab4.WebApp
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(
+                    options => options.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -92,6 +97,10 @@ namespace Lab4.WebApp
 
             app.UseAuthentication();
 
+            app.UseSignalR(routes => {
+                routes.MapHub<ChatHub>("/ChatHub");
+            });
+            
             app.UseMvc(routes => {
                 routes.MapRoute(
                     name: "default",

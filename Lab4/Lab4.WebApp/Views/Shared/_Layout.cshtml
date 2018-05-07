@@ -32,6 +32,7 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-controller="User" asp-action="Index">Users</a></li>
+                    <li><a asp-controller="Chat" asp-action="Index">Chats</a></li>
                     <li><a asp-controller="Account" asp-action="Logout">Logout</a></li>
                 </ul>
             </div>
@@ -44,7 +45,8 @@
             <p>&copy; 2018 - Lab4.WebApp</p>
         </footer>
     </div>
-
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/lodash/lodash.core.min.js"></script>
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
@@ -65,7 +67,6 @@
         </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>
