@@ -48,14 +48,11 @@ namespace Lab4.BLL.Services
             User user = null;
             using (var dbContext = new SocialNetDbContext(ConnectionString)) {
                 user = dbContext.Users
-                    .Where(u => u.Login == login)
-                    .FirstOrDefault();
+                    .FirstOrDefault(u => u.Login == login);
             }
             if (user == null)
                 return null;
-            if (CryptoUtils.VerifyHashedPassword(user.Password, password))
-                return user;
-            return null;
+            return CryptoUtils.VerifyHashedPassword(user.Password, password) ? user : null;
         }
     }
 }

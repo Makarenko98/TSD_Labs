@@ -48,6 +48,16 @@ namespace Lab3_Lab2Test
         }
 
         [Test]
+        public void Add_NullNull()
+        {
+            var d = new MyDictionary<string, string>();
+            var item = new KeyValuePair<string, string>(null, null);
+            Assert.Throws<ArgumentNullException>(() => {
+                d.Add(item);
+            });
+        }
+
+        [Test]
         public void Add_MultipleRecords()
         {
             MyDictionary<int, string> d = new MyDictionary<int, string>();

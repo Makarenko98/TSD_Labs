@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lab4.BLL\Lab4.BLL.csproj" />
+    <ProjectReference Include="..\Lab4.WebApp\Lab4.WebApp.csproj" />
   </ItemGroup>
 
 </Project>

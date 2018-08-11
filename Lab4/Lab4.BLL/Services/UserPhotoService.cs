@@ -10,12 +10,13 @@ namespace Lab4.BLL.Services
 {
     public class UserPhotoService
     {
-        protected string ConnectionString;
-        protected string FileStoragePath;
+        protected readonly string ConnectionString;
+        protected readonly string FileStoragePath;
 
         public UserPhotoService(string connectionString, string fileStoragePath)
         {
             ConnectionString = connectionString;
+            FileStoragePath = fileStoragePath;
         }
 
         private string GetUserPhotoDirectoryPath(int userId)
@@ -40,8 +41,9 @@ namespace Lab4.BLL.Services
             var name = fileName.Substring(0, fileName.Length - fileExtension.Length);
             var similarFileNameRegexp = new Regex($@"^{name}(\(([0-9])+\))?\{fileExtension}", RegexOptions.IgnoreCase);
             var similarFileName = directory.GetFiles()
-                .Where((f) => similarFileNameRegexp.IsMatch(f.Name))
-                .OrderBy((f) => f.Name).LastOrDefault().Name;
+                                      .Where((f) => similarFileNameRegexp.IsMatch(f.Name))
+                                      .OrderBy((f) => f.Name).LastOrDefault()
+                                      ?.Name ?? "";
 
             return $"{name}({similarFileNameRegexp.Match(similarFileName).Groups[2]}){fileExtension}";
         }
@@ -63,11 +65,9 @@ namespace Lab4.BLL.Services
         public UserPhoto UploadPhoto(int userId, string fileName, Stream inputStream)
         {
             if (string.IsNullOrEmpty(fileName))
-                throw new ArgumentNullException("fileName can't be empty");
-            if (inputStream == null)
-                throw new ArgumentNullException("Stream can't be null");
-            if (inputStream.Length == 0)
-                throw new ArgumentNullException("Stream can't be empty");
+                throw new ArgumentNullException(nameof(fileName) + " can't be empty");
+            if (inputStream == null || inputStream.Length == 0)
+                throw new ArgumentNullException(nameof(inputStream) + " can't be null or empty");
 
             fileName = SaveFile(userId, fileName, inputStream);
 
@@ -79,6 +79,7 @@ namespace Lab4.BLL.Services
                 }).Entity;
                 db.SaveChanges();
             }
+
             return userPhoto;
         }
 
@@ -88,6 +89,7 @@ namespace Lab4.BLL.Services
             if (File.Exists(path)) {
                 return new FileStream(path, FileMode.Open, FileAccess.Read);
             }
+
             return null;
         }
 

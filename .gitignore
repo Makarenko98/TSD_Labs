@@ -6,3 +6,8 @@ out/
 ~$*
 *.ncrunchsolution*
 *NCrunch*/
+/CourseWork.txt
+/Lab4/node_modules/@aspnet/signalr
+/pal/
+.idea/
+.vscode/

@@ -11,7 +11,7 @@ namespace Lab4.BLL.Services
 {
     public class ChatService
     {
-        protected string ConnectionString;
+        protected readonly string ConnectionString;
 
         public ChatService(string connectionString)
         {
@@ -30,10 +30,10 @@ namespace Lab4.BLL.Services
         public Message SendMessage(string login, int chatId, string text)
         {
             using (var db = new SqlConnection(ConnectionString)) {
-                var sql = "insert into Messages (ChatId, UserId, Text)".NewLine() +
-                        "output inserted.*".NewLine() +
-                        "values(@chatId, (select top 1 id from Users u where u.Login = @login), @text)";
-                return db.QueryFirst<Message>(sql, new { login, chatId, text });
+                const string sql = @"insert into Messages (ChatId, UserId, Text)
+                                output inserted.*
+                            values(@chatId, (select top 1 id from Users u where u.Login = @login), @text)";
+                return db.QueryFirst<Message>(sql, new {login, chatId, text});
             }
         }
 
@@ -47,62 +47,62 @@ namespace Lab4.BLL.Services
         public IEnumerable<Message> GetMessages(int userId, int chatId, int count = 20)
         {
             if (count < 1)
-                throw new ArgumentOutOfRangeException("Count must be more than 1");
+                throw new ArgumentOutOfRangeException(nameof(count) + "Count must be more than 1");
 
             using (var db = new SqlConnection(ConnectionString)) {
                 return db.Query<Message, User, Message>(
-                    $"select top {count} *".NewLine() +//m.Id as Message, m.Text, u.Id as [User], u.FirstName, u.LastName
-                    "from Messages m".NewLineWithTab() +
-                        "join ChatUsers cu on cu.ChatId = @chatId".NewLineWithTab(2) +
-                            "and @userId = cu.UserId".NewLineWithTab() +
-                        "join Users u on u.Id = m.UserId".NewLine() +
-                    "order by m.time desc",
+                    $@"select top {count} *
+                    from Messages m
+                        join ChatUsers cu on cu.ChatId = @chatId
+                            and @userId = cu.UserId
+                        join Users u on u.Id = m.UserId
+                    order by m.time desc",
                     (message, user) => {
                         message.User = user;
                         return message;
                     },
-                    new { chatId, userId });
+                    new {chatId, userId});
             }
         }
 
         public IEnumerable<Message> GetNextMessages(int lastMessageId, int userId, int count = 20)
         {
             if (count < 1)
-                throw new ArgumentOutOfRangeException("Count must be more than 1");
+                throw new ArgumentOutOfRangeException(nameof(count) + " must be more than 1");
 
             using (var db = new SqlConnection(ConnectionString)) {
                 return db.Query<Message, User, Message>(
-                    $"select top {count} m.*, u.*" +
-                    "from Messages m".NewLineWithTab() +
-                        "join Users u on u.Id = m.UserId".NewLineWithTab() +
-                        "join Messages m1 on m1.Id = @lastMessageId".NewLineWithTab(2) +
-                            "and m.ChatId = m1.ChatId".NewLineWithTab(2) +
-                            "and m.Time < m1.Time".NewLineWithTab() +
-                        "join ChatUsers cu on m1.ChatId = cu.ChatId".NewLineWithTab(2) +
-                            "and @userId = cu.UserId".NewLineWithTab() +
-                    "order by m.time desc",
+                    $@"select top {count} m.*, u.*
+                    from Messages m
+                        join Users u on u.Id = m.UserId
+                        join Messages m1 on m1.Id = @lastMessageId
+                            and m.ChatId = m1.ChatId
+                            and m.Time < m1.Time
+                        join ChatUsers cu on m1.ChatId = cu.ChatId
+                            and @userId = cu.UserId
+                    order by m.time desc",
                     (message, user) => {
                         message.User = user;
                         return message;
                     },
-                    new { lastMessageId, userId });
+                    new {lastMessageId, userId});
             }
         }
 
         public IEnumerable<User> GetGetPotentialChatParticipants(int chatId, string userLogin)
         {
             using (var db = new SqlConnection(ConnectionString)) {
-                var sql = "select u1.*".NewLineWithTab() +
-                            "from UserFriends uf".NewLineWithTab(2) +
-                                "join Users u on u.login = @login".NewLineWithTab(3) +
-                                    "and u.Id = uf.UserId".NewLineWithTab(4) +
-                                "join Users u1 on u1.id = uf.FriendId".NewLineWithTab(3) +
-                            "where not exists (".NewLineWithTab() +
-                                    "select null".NewLineWithTab(3) +
-                                    "from ChatUsers cu".NewLineWithTab(3) +
-                                    "where cu.ChatId = @chatId".NewLineWithTab(3) +
-                                        "and cu.UserId = uf.FriendId)".NewLineWithTab(4);
-                return db.Query<User>(sql, new { login = userLogin, chatId = chatId });
+                const string sql = @"select u1.*
+                            from UserFriends uf
+                                join Users u on u.login = @login
+                                    and u.Id = uf.UserId
+                                join Users u1 on u1.id = uf.FriendId
+                            where not exists (
+                                    select null
+                                    from ChatUsers cu
+                                    where cu.ChatId = @chatId
+                                        and cu.UserId = uf.FriendId)";
+                return db.Query<User>(sql, new {login = userLogin, chatId = chatId});
             }
         }
     }

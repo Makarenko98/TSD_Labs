@@ -11,7 +11,7 @@ namespace Lab4.BLL.Services
 {
     public class FriendService
     {
-        protected string ConnectionString;
+        protected readonly string ConnectionString;
 
         public FriendService(string connectionString)
         {
@@ -57,6 +57,7 @@ namespace Lab4.BLL.Services
 
                 db.SaveChanges();
             }
+
             return userFriend;
         }
 
@@ -67,6 +68,7 @@ namespace Lab4.BLL.Services
                 friendRequest.StateId = FriendRequestStateConstants.Postponed;
                 db.SaveChanges();
             }
+
             return friendRequest;
         }
 
@@ -77,6 +79,7 @@ namespace Lab4.BLL.Services
                 friendRequest.StateId = FriendRequestStateConstants.Rejected;
                 db.SaveChanges();
             }
+
             return friendRequest;
         }
 
@@ -84,9 +87,10 @@ namespace Lab4.BLL.Services
         {
             using (var db = new SqlConnection(ConnectionString)) {
                 db.ExecuteScalar(
-                    "delete from UserFriend".NewLineWithTab() +
-                    "where UserId = @UserId and FriendId = @FriendId".NewLineWithTab() +
-                    "or UserId = @FriendId and FriendId = @UserId", new { UserId = userFriend.UserId, FriendId = userFriend.FriendId });
+                    @"delete from UserFriend
+                    where UserId = @UserId and FriendId = @FriendId
+                        or UserId = @FriendId and FriendId = @UserId",
+                    new {UserId = userFriend.UserId, FriendId = userFriend.FriendId});
             }
         }
     }
